@@ -11,7 +11,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT || 3000;
 
   app.use(express.json());
 
@@ -21,22 +21,28 @@ async function startServer() {
     
     console.log('Proxying chat message to n8n:', { chatInput, sessionId, email });
 
+    const webhookUrl = process.env.N8N_WEBHOOK_URL || 'https://nik0018.app.n8n.cloud/webhook/878665de-dd47-440f-85a3-a27513c5ef65/chat';
+
     try {
-      const n8nResponse = await fetch('https://nik0018.app.n8n.cloud/webhook/878665de-dd47-440f-85a3-a27513c5ef65/chat', {
+      const n8nResponse = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ chatInput, sessionId, email }),
+        body: JSON.stringify({ action: 'sendMessage', chatInput, sessionId, email }),
       });
 
       if (!n8nResponse.ok) {
         const errorText = await n8nResponse.text();
         console.warn('n8n Webhook Error, falling back to Gemini on server:', n8nResponse.status, errorText);
-        
+
+        if (!process.env.GEMINI_API_KEY) {
+          return res.json({ bot_message: "I'm having trouble reaching my backend right now. Please try again in a moment." });
+        }
+
         // Server-side Gemini Fallback
         const genResponse = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
+          model: "gemini-2.0-flash",
           contents: [
             { text: `You are Anaya, a helpful AI Financial Buddy for Economic Times. 
             Your goal is to profile the user and eventually generate a financial plan.
@@ -111,17 +117,21 @@ async function startServer() {
       res.json(data);
     } catch (error) {
       console.error('Server Proxy Error, falling back to Gemini:', error);
-      
+
+      if (!process.env.GEMINI_API_KEY) {
+        return res.json({ bot_message: "I'm having trouble reaching my backend right now. Please try again in a moment." });
+      }
+
       // Final fallback if even fetch fails
       try {
         const genResponse = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
+          model: "gemini-2.0-flash",
           contents: `You are Anaya, a helpful AI Financial Buddy for Economic Times. Provide expert financial guidance. User Message: ${chatInput}`,
         });
         return res.json({ bot_message: genResponse.text });
       } catch (geminiError) {
         console.error('Final Gemini Fallback Error:', geminiError);
-        res.status(500).json({ error: 'Internal server error while proxying request' });
+        res.json({ bot_message: "I'm having trouble connecting right now. Please try again in a moment." });
       }
     }
   });
