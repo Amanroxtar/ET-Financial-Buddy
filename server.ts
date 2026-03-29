@@ -21,13 +21,15 @@ async function startServer() {
     
     console.log('Proxying chat message to n8n:', { chatInput, sessionId, email });
 
+    const webhookUrl = process.env.N8N_WEBHOOK_URL || 'https://nik0018.app.n8n.cloud/webhook/878665de-dd47-440f-85a3-a27513c5ef65/chat';
+
     try {
-      const n8nResponse = await fetch('https://nik0018.app.n8n.cloud/webhook/878665de-dd47-440f-85a3-a27513c5ef65/chat', {
+      const n8nResponse = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ chatInput, sessionId, email }),
+        body: JSON.stringify({ action: 'sendMessage', chatInput, sessionId, email }),
       });
 
       if (!n8nResponse.ok) {
