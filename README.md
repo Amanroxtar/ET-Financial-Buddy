@@ -6,7 +6,7 @@
 
 This contains everything you need to run your app locally.
 
-View your app in AI Studio: https://ai.studio/apps/42de7e31-528d-47e2-8f24-53daa229653f
+View your app : https://et-financial-buddy-production.up.railway.app/
 
 ## Run Locally
 
