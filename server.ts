@@ -23,15 +23,25 @@ async function startServer() {
     console.log('Proxying chat message to n8n:', { chatInput, sessionId, email });
 
     try {
-      const n8nResponse = await fetch('https://nik0018.app.n8n.cloud/webhook/d4609656-aedd-4f6e-bdf4-f1b3348a12f5', {
+      const webhookUrl = 'https://nik0018.app.n8n.cloud/webhook/d4609656-aedd-4f6e-bdf4-f1b3348a12f5';
+      console.log(`Sending POST request to: ${webhookUrl}`);
+      
+      const n8nResponse = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ chatInput, sessionId, email }),
+        body: JSON.stringify({ 
+          chatInput, 
+          sessionId, 
+          email,
+          timestamp: new Date().toISOString()
+        }),
       });
 
+      console.log(`n8n Response Status: ${n8nResponse.status} ${n8nResponse.statusText}`);
       const responseText = await n8nResponse.text();
+      console.log('n8n Raw Response:', responseText);
       
       if (!n8nResponse.ok) {
         console.warn('n8n Webhook Error, falling back to Gemini on server:', n8nResponse.status, responseText);

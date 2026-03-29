@@ -91,6 +91,8 @@ export default function Chat({
     if (!overrideText) setInput('');
     setIsLoading(true);
 
+    console.log('Chat: Sending message to /api/chat', { messageText, sessionId, userEmail });
+
     try {
       let data;
       try {
