@@ -7,11 +7,12 @@ import { GoogleGenAI } from "@google/genai";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || '';
+const ai = new GoogleGenAI({ apiKey });
 
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT || 3000;
+  const PORT = 3000;
 
   app.use(express.json());
 
@@ -21,28 +22,23 @@ async function startServer() {
     
     console.log('Proxying chat message to n8n:', { chatInput, sessionId, email });
 
-    const webhookUrl = process.env.N8N_WEBHOOK_URL || 'https://nik0018.app.n8n.cloud/webhook/878665de-dd47-440f-85a3-a27513c5ef65/chat';
-
     try {
-      const n8nResponse = await fetch(webhookUrl, {
+      const n8nResponse = await fetch('https://nik0018.app.n8n.cloud/webhook/d4609656-aedd-4f6e-bdf4-f1b3348a12f5', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ action: 'sendMessage', chatInput, sessionId, email }),
+        body: JSON.stringify({ chatInput, sessionId, email }),
       });
 
+      const responseText = await n8nResponse.text();
+      
       if (!n8nResponse.ok) {
-        const errorText = await n8nResponse.text();
-        console.warn('n8n Webhook Error, falling back to Gemini on server:', n8nResponse.status, errorText);
-
-        if (!process.env.GEMINI_API_KEY) {
-          return res.json({ bot_message: "I'm having trouble reaching my backend right now. Please try again in a moment." });
-        }
-
+        console.warn('n8n Webhook Error, falling back to Gemini on server:', n8nResponse.status, responseText);
+        
         // Server-side Gemini Fallback
         const genResponse = await ai.models.generateContent({
-          model: "gemini-2.0-flash",
+          model: "gemini-3-flash-preview",
           contents: [
             { text: `You are Anaya, a helpful AI Financial Buddy for Economic Times. 
             Your goal is to profile the user and eventually generate a financial plan.
@@ -112,26 +108,45 @@ async function startServer() {
         }
       }
 
-      const data = await n8nResponse.json();
-      console.log('n8n Response received:', data);
-      res.json(data);
-    } catch (error) {
-      console.error('Server Proxy Error, falling back to Gemini:', error);
-
-      if (!process.env.GEMINI_API_KEY) {
-        return res.json({ bot_message: "I'm having trouble reaching my backend right now. Please try again in a moment." });
+      if (!responseText) {
+        throw new Error('Empty response from n8n');
       }
 
+      try {
+        const data = JSON.parse(responseText);
+        console.log('n8n Response received:', data);
+        
+        // Normalize n8n response (often returns an array)
+        let result = Array.isArray(data) ? data[0] : data;
+        
+        // Ensure bot_message is present for the frontend
+        if (result && typeof result === 'object') {
+          if (!result.bot_message) {
+            result.bot_message = result.output || result.message || result.text || "Response received";
+          }
+        } else {
+          // If result is not an object, wrap it
+          result = { bot_message: String(result) };
+        }
+        
+        res.json(result);
+      } catch (jsonError) {
+        console.warn('n8n Response is not JSON, sending as bot_message:', responseText);
+        res.json({ bot_message: responseText });
+      }
+    } catch (error) {
+      console.error('Server Proxy Error, falling back to Gemini:', error);
+      
       // Final fallback if even fetch fails
       try {
         const genResponse = await ai.models.generateContent({
-          model: "gemini-2.0-flash",
+          model: "gemini-3-flash-preview",
           contents: `You are Anaya, a helpful AI Financial Buddy for Economic Times. Provide expert financial guidance. User Message: ${chatInput}`,
         });
         return res.json({ bot_message: genResponse.text });
       } catch (geminiError) {
         console.error('Final Gemini Fallback Error:', geminiError);
-        res.json({ bot_message: "I'm having trouble connecting right now. Please try again in a moment." });
+        res.status(500).json({ error: 'Internal server error while proxying request' });
       }
     }
   });
