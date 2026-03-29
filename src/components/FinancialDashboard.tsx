@@ -7,7 +7,6 @@ import {
   PiggyBank, 
   AlertCircle, 
   ArrowRight,
-  Zap,
   Target,
   BarChart3,
   User,
@@ -23,10 +22,7 @@ import {
   Scale,
   ArrowUpCircle,
   ArrowDownCircle,
-  CheckCircle2,
-  CalendarDays,
-  PieChart,
-  Layers
+  CheckCircle2
 } from 'lucide-react';
 import { DashboardData } from '../types/dashboard';
 import PremiumUnlock from './PremiumUnlock';

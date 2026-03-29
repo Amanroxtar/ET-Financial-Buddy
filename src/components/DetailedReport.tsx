@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   FileText, TrendingUp, AlertTriangle, Lightbulb, 
-  Calendar, Target, PieChart, ArrowUpRight, 
+  Calendar, PieChart, ArrowUpRight, 
   CheckCircle, Shield, Briefcase, Activity,
-  ArrowLeft, Download, Share2, Printer, Mail,
-  Lock, Award, BarChart3, Wallet, Percent,
+  ArrowLeft, Download, Mail,
+  Lock, Award, Percent,
   Zap, Brain, ListChecks, Info, Loader2
 } from 'lucide-react';
 import { DetailedReportData } from '../types/report';
@@ -270,15 +270,15 @@ export default function DetailedReport({ report, onBack }: DetailedReportProps) 
         </button>
         
         <div className="flex items-center space-x-4">
-          <button className="p-2 text-gray-400 hover:text-et-red transition-colors hidden sm:block" title="Print Report">
-            <Printer size={20} />
-          </button>
-          <button className="p-2 text-gray-400 hover:text-et-red transition-colors hidden sm:block" title="Download PDF">
-            <Download size={20} />
-          </button>
-          <button className="bg-et-red text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-red-700 transition-all shadow-lg shadow-red-200">
-            Share Report
-          </button>
+          {pdfUrl && (
+            <button 
+              onClick={handleDownload}
+              className="p-2 text-gray-400 hover:text-et-red transition-colors hidden sm:block" 
+              title="Download PDF"
+            >
+              <Download size={20} />
+            </button>
+          )}
         </div>
       </div>
 

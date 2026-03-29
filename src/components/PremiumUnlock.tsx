@@ -1,7 +1,7 @@
 
 import { useState, useRef, ChangeEvent, KeyboardEvent, FormEvent, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, ShieldCheck, Lock, Smartphone, Loader2, CheckCircle2, FileText, TrendingUp, AlertTriangle, Lightbulb, Calendar, Target, PieChart, ArrowUpRight, CheckCircle } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Lock, Smartphone, Loader2, CheckCircle2, FileText, TrendingUp, Target } from 'lucide-react';
 import { DashboardData } from '../types/dashboard';
 import { DetailedReportData } from '../types/report';
 
