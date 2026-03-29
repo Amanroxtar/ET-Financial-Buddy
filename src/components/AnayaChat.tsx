@@ -84,10 +84,13 @@ export default function AnayaChat({ email = 'guest@etmoney.com' }: AnayaChatProp
         data = await response.json();
       } catch (webhookError) {
         console.warn('AnayaChat: n8n Webhook failed, falling back to Gemini:', webhookError);
-        
+
+        if (!process.env.GEMINI_API_KEY) {
+          data = { bot_message: "I'm having trouble reaching my backend right now. Please try again in a moment." };
+        } else {
         // Smart Gemini Fallback - Can handle profiling and generate dashboard
         const genResponse = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
+          model: "gemini-2.0-flash",
           contents: [
             { text: `You are Anaya, a helpful AI Financial Buddy for Economic Times. 
             Your goal is to profile the user and eventually generate a financial plan.
@@ -154,6 +157,7 @@ export default function AnayaChat({ email = 'guest@etmoney.com' }: AnayaChatProp
           console.error('AnayaChat: Gemini JSON Parse Error:', parseError);
           data = { bot_message: genResponse.text };
         }
+        } // end GEMINI_API_KEY guard
       }
       
       console.log('AnayaChat: API response received', data);
