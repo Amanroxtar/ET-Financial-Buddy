@@ -23,7 +23,7 @@ async function startServer() {
     console.log('Proxying chat message to n8n:', { chatInput, sessionId, email });
 
     try {
-      const webhookUrl = 'https://nik0018.app.n8n.cloud/webhook/d4609656-aedd-4f6e-bdf4-f1b3348a12f5';
+      const webhookUrl = 'https://amangg1234.app.n8n.cloud/webhook/d4609656-aedd-4f6e-bdf4-f1b3348a12f5';
       console.log(`Sending POST request to: ${webhookUrl}`);
       
       const n8nResponse = await fetch(webhookUrl, {
