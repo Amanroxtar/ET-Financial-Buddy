@@ -76,7 +76,7 @@ export default function PremiumUnlock({ data, onShowReport }: PremiumUnlockProps
       }, 800);
 
       try {
-        const webhookUrl = 'https://amangg1234.app.n8n.cloud/webhook/77009da1-3fd2-4ff9-84f4-8db45a0f2f45';
+        const webhookUrl = 'https://amangg317.app.n8n.cloud/webhook/77009da1-3fd2-4ff9-84f4-8db45a0f2f45';
         
         const payload = {
           mobile_number: phone,

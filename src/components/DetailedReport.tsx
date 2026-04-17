@@ -60,7 +60,7 @@ export default function DetailedReport({ report, onBack }: DetailedReportProps) 
     setPdfResponse(null);
 
     try {
-      const response = await fetch('https://amangg1234.app.n8n.cloud/webhook/eb01def9-52cd-4ad3-bda6-aa2099f09e50', {
+      const response = await fetch('https://amangg317.app.n8n.cloud/webhook/eb01def9-52cd-4ad3-bda6-aa2099f09e50', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ export default function DetailedReport({ report, onBack }: DetailedReportProps) 
     setEmailSent(false);
 
     try {
-      const url = new URL('https://amangg1234.app.n8n.cloud/webhook/4a1dceb0-9a91-432c-b245-76eabe6216e9');
+      const url = new URL('https://amangg317.app.n8n.cloud/webhook/4a1dceb0-9a91-432c-b245-76eabe6216e9');
       url.searchParams.append('email', email);
       url.searchParams.append('pdfUrl', pdfUrl);
       if (pdfResponse) {
